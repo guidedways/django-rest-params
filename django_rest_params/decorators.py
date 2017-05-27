@@ -3,6 +3,7 @@ from functools import wraps
 from django.conf import settings
 from rest_framework import status
 from rest_framework.response import Response
+import sys
 
 SETTINGS = getattr(settings, 'DJANGO_REST_PARAMS', {})
 TRUE_VALUES = SETTINGS.get('TRUE_VALUES', ('1', 'true'))
@@ -68,8 +69,12 @@ def params(**kwargs):
                 elif self.param_type == float:
                     param = float(param)
                 elif self.param_type == str:
-                    assert(isinstance(param, (str, unicode)))
-                    param = unicode(param)
+                    if (sys.version_info > (3, 0)):
+                        assert(isinstance(param, (str)))
+                        param = str(param)
+                    else:
+                        assert(isinstance(param, (str, unicode)))
+                        param = unicode(param)
                 elif self.param_type == bool:
                     param = str(param).lower()  # bool isn't case sensitive
                     if param in TRUE_VALUES:
